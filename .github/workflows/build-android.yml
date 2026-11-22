@@ -97,6 +97,14 @@ jobs:
       - name: Importar recursos
         run: ~/godot/godot --headless --path game --import || true
 
+      - name: Validar scripts del port
+        run: |
+          for f in touch_nav touch_controls; do
+            out=$(~/godot/godot --headless --path game --check-only --script res://port/$f.gd 2>&1 || true)
+            echo "$out"
+            if echo "$out" | grep -qiE "parse error|script error"; then exit 1; fi
+          done
+
       - name: Plantilla Android (gradle) + parche 120 Hz
         run: |
           rm -rf game/android/build
@@ -112,10 +120,13 @@ jobs:
           GODOT_ANDROID_KEYSTORE_DEBUG_PATH: ${{ github.workspace }}/android/debug.keystore
           GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
           GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
+          GODOT_ANDROID_KEYSTORE_RELEASE_PATH: ${{ github.workspace }}/android/debug.keystore
+          GODOT_ANDROID_KEYSTORE_RELEASE_USER: androiddebugkey
+          GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: android
         run: |
           mkdir -p build
           V=$(cat VERSION)
-          ~/godot/godot --headless --path game --export-debug "Android" "$GITHUB_WORKSPACE/build/PokemonOverlord-v$V.apk"
+          ~/godot/godot --headless --path game --export-release "Android" "$GITHUB_WORKSPACE/build/PokemonOverlord-v$V.apk"
           ls -la build
           test -f "build/PokemonOverlord-v$V.apk"
 
