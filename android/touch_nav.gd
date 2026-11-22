@@ -38,12 +38,19 @@ func _input(e: InputEvent) -> void:
 	var tc = get_node_or_null("/root/TouchControls")
 	if tc and tc.has_method("is_over_controls") and tc.is_over_controls(e.position):
 		return
+	var pu = get_node_or_null("/root/PortUI")
+	if pu and pu.has_method("is_blocking") and pu.is_blocking(e.position):
+		return
+	if tc and tc.has_method("ripple"):
+		tc.ripple(e.position)
 	_handle_tap(e.position)
 
 
 # ---------------------------------------------------------------- lógica
 
 func _handle_tap(p: Vector2) -> void:
+	if _volume_tap(p):
+		return
 	for entry in _active_entries():
 		var seq = _resolve(entry, p)
 		if seq != null:
@@ -127,6 +134,104 @@ func _press_seq(seq: Array) -> void:
 		await get_tree().physics_frame
 		await get_tree().process_frame
 	busy = false
+
+
+# ---------------------------------------------------------------- volumen (Opciones)
+
+func _volume_ui():
+	var g = get_node_or_null("/root/globals")
+	var ui = g.get("ui") if g else null
+	if ui == null or not is_instance_valid(ui) or int(ui.get("state")) != 1:
+		return null
+	var om = ui.get("options_menu")
+	if om == null or not om.visible:
+		return null
+	return ui
+
+
+func _volume_tap(p: Vector2) -> bool:
+	var ui = _volume_ui()
+	if ui == null:
+		return false
+	var idx := int(ui.option_index)
+	var item = ui.options_items.get_child(idx)
+	var bar = item.get_node_or_null("BarBG")
+	if bar == null:
+		bar = item.get_node_or_null("Bar")
+	var r = _item_rect(bar)
+	var key: String = ["bgm_volume", "se_volume"][clampi(idx, 0, 1)]
+	var g = get_node("/root/globals")
+	if r != null and (r as Rect2).grow(24).has_point(p):
+		var rr: Rect2 = r
+		var target := clampf(snappedf((p.x - rr.position.x) / maxf(rr.size.x, 1.0), 0.1), 0.1, 1.0)
+		var cur: float = g.options[key]
+		var steps := int(round((target - cur) / 0.1))
+		if steps != 0:
+			_press_seq(_repeat("right" if steps > 0 else "left", abs(steps)))
+	else:
+		_press_seq(["Accept"])  # tocar fuera de la barra = terminar
+	return true
+
+
+# ---------------------------------------------------------------- pistas
+
+var _ctx := ""
+var _ctx_seen := {}
+var _ctx_timer := 0.0
+
+const HINTS := {
+	"title": "Toca una opción para ver qué es · tócala otra vez para entrar",
+	"menu": "Toca una opción para elegirla · tócala otra vez para confirmar · ‹ Atrás para salir",
+	"options": "Toca un volumen y luego toca la barra para ajustarlo · ‹ Atrás para salir",
+	"volume": "Toca la barra para cambiar el volumen · toca fuera para terminar",
+	"formation": "Toca una casilla para elegirla · otra vez para tomar o colocar al Pokémon",
+	"shop": "Toca una carta para elegirla · otra vez para comprar · ‹ Atrás para salir",
+	"choice": "Toca una respuesta para elegirla · tócala otra vez para confirmar",
+	"lc": "Toca un personaje para elegirlo · otra vez para confirmar · ‹ Atrás para volver",
+}
+
+
+func _process(d: float) -> void:
+	_ctx_timer += d
+	if _ctx_timer < 0.4:
+		return
+	_ctx_timer = 0.0
+	var c := _context()
+	if c != _ctx:
+		_ctx = c
+		if c != "" and not _ctx_seen.has(c):
+			_ctx_seen[c] = true
+			var tc = get_node_or_null("/root/TouchControls")
+			if tc and tc.has_method("show_hint"):
+				tc.show_hint(HINTS.get(c, HINTS["menu"]))
+
+
+func _context() -> String:
+	if _volume_ui() != null:
+		return "volume"
+	for cl in _find_named("ChoiceList"):
+		if cl.is_visible_in_tree():
+			return "choice"
+	var g = get_node_or_null("/root/globals")
+	var ui = g.get("ui") if g else null
+	if ui and is_instance_valid(ui):
+		var st := int(ui.get("state")) if ui.get("state") != null else 0
+		match st:
+			13:
+				return "options"
+			5:
+				return "formation"
+			7, 9:
+				return "shop"
+			2, 3, 4, 8, 10, 11:
+				return "menu"
+	var lc = _find_script(LC_SCRIPT)
+	if lc and int(lc.get("state")) == 0:
+		return "lc"
+	var title = _find_script(TITLE_SCRIPT)
+	if title and int(title.get("state")) == 1:
+		return "title"
+	return ""
 
 
 # ---------------------------------------------------------------- menús

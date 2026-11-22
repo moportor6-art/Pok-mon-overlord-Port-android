@@ -102,7 +102,7 @@ jobs:
 
       - name: Validar scripts del port
         run: |
-          for f in patch_loader touch_nav touch_controls; do
+          for f in patch_loader port_ui touch_nav touch_controls; do
             out=$(~/godot/godot --headless --path game --check-only --script res://port/$f.gd 2>&1 || true)
             echo "$out"
             if echo "$out" | grep -qiE "parse error|script error"; then exit 1; fi

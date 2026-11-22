@@ -15,7 +15,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 port = os.path.join(proj, "port")
 os.makedirs(port, exist_ok=True)
-for fn in ["patch_loader.gd", "touch_controls.gd", "touch_nav.gd", "splash.png", "icon_192.png", "icon_512.png",
+for fn in ["patch_loader.gd", "port_ui.gd", "touch_controls.gd", "touch_nav.gd", "splash.png", "icon_192.png", "icon_512.png",
            "icon_fg_432.png", "icon_bg_432.png"]:
     shutil.copy(os.path.join(here, fn), os.path.join(port, fn))
 
@@ -25,6 +25,10 @@ presets = presets.replace('version/name="0.1"', f'version/name="{version}"')
 presets = re.sub(r"version/code=\d+", f"version/code={run}", presets)
 with open(os.path.join(proj, "export_presets.cfg"), "w", encoding="utf-8") as f:
     f.write(presets)
+
+# Español
+import subprocess
+subprocess.check_call([sys.executable, os.path.join(here, "translate_es.py"), proj])
 
 pg = os.path.join(proj, "project.godot")
 with open(pg, encoding="utf-8") as f:
@@ -48,6 +52,8 @@ def set_key(section, key, value):
 
 set_key("autoload", "TouchControls", '"*res://port/touch_controls.gd"')
 set_key("autoload", "TouchNav", '"*res://port/touch_nav.gd"')
+set_key("autoload", "PortUI", '"*res://port/port_ui.gd"')
+set_key("application", "config/port_version", f'"{version}"')
 # Logo del juego en vez de Godot
 set_key("application", "config/icon", '"res://port/icon_512.png"')
 set_key("application", "boot_splash/show_image", "true")

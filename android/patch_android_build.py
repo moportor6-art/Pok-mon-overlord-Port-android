@@ -39,6 +39,10 @@ CODE = """
         } catch (Throwable t) { }
         // --- Port: buscar actualizaciones al abrir (sin internet, nada) ---
         final android.app.Activity self = this;
+        UpdaterBridge.init(this);
+        if (savedInstanceState != null && savedInstanceState.getBoolean("__port_keep__")) {   // mantiene los métodos del puente
+            UpdaterBridge.check(); UpdaterBridge.history(); UpdaterBridge.build();
+        }
         new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
             try { new Updater(self).check(false); } catch (Throwable t) { }
         }, 5000);
@@ -50,9 +54,10 @@ if not files:
 act = files[0]
 src = act.read_text(encoding="utf-8")
 if "Port: pedir la tasa" not in src:
-    m = re.search(r"super\.onCreate\([^)]*\);", src)
+    m = re.search(r"super\.onCreate\(([^)]*)\);", src)
     if m:
-        src = src[:m.end()] + CODE + src[m.end():]
+        arg = m.group(1).strip() or "savedInstanceState"
+        src = src[:m.end()] + CODE.replace("savedInstanceState", arg) + src[m.end():]
     else:
         i = src.rindex("}")
         src = src[:i] + """
@@ -65,7 +70,7 @@ print("Actividad parcheada:", act)
 
 pkg_dir = act.parent
 pkg = re.search(r"^package\s+([\w.]+);", src, re.M).group(1)
-for fn in ["Updater.java", "InstallReceiver.java"]:
+for fn in ["Updater.java", "InstallReceiver.java", "UpdaterBridge.java"]:
     t = (here / "updater" / fn).read_text(encoding="utf-8")
     t = re.sub(r"^package\s+[\w.]+;", f"package {pkg};", t, flags=re.M)
     (pkg_dir / fn).write_text(t, encoding="utf-8")

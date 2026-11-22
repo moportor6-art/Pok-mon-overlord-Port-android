@@ -120,6 +120,43 @@ final class Updater {
         }).start();
     }
 
+    /** Historial de versiones en una ventana (botón del juego). */
+    void history() {
+        final Progress pr = new Progress("Cargando historial…", 1);
+        new Thread(() -> {
+            try {
+                org.json.JSONArray rel = new org.json.JSONArray(get("https://api.github.com/repos/" + REPO + "/releases?per_page=15"));
+                StringBuilder sb = new StringBuilder();
+                int current = Math.max(BuildInfo.BUILD, overlayBuild());
+                for (int i = 0; i < rel.length(); i++) {
+                    JSONObject r = rel.getJSONObject(i);
+                    int b = buildOf(r.optString("tag_name"));
+                    if (b <= 0) continue;
+                    String date = r.optString("published_at");
+                    if (date.length() >= 10) date = date.substring(0, 10);
+                    sb.append("■ Build ").append(b).append(b == current ? "  (la tuya)" : "").append(" · ").append(date).append('\n');
+                    String notes = r.optString("body").trim();
+                    if (notes.length() > 400) notes = notes.substring(0, 400) + "…";
+                    if (!notes.isEmpty()) sb.append(notes).append('\n');
+                    sb.append('\n');
+                }
+                final String text = sb.length() == 0 ? "Todavía no hay versiones publicadas." : sb.toString().trim();
+                ui(() -> {
+                    pr.close();
+                    if (act.isFinishing()) return;
+                    new AlertDialog.Builder(act)
+                            .setTitle("Historial de versiones")
+                            .setMessage(text)
+                            .setPositiveButton("Buscar actualización", (d, i) -> check(true))
+                            .setNegativeButton("Cerrar", null)
+                            .show();
+                });
+            } catch (Exception e) {
+                ui(() -> { pr.close(); toast("No se pudo cargar el historial (¿sin internet?)."); });
+            }
+        }).start();
+    }
+
     private void showRollbackNotice() {
         File f = new File(dir, "vuelta_atras.txt");
         if (!f.isFile()) return;

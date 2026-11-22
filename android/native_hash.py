@@ -8,7 +8,7 @@ import sys
 
 h = hashlib.sha256(sys.argv[1].encode())
 files = sorted(pathlib.Path("android").rglob("*"))
-files = [f for f in files if f.is_file() and f.suffix not in (".gd",)]   # los .gd del port viajan en el parche
+files = [f for f in files if f.is_file() and f.suffix not in (".gd",) and f.name not in ("es.json", "translate_es.py")]   # viajan en el parche
 files.append(pathlib.Path("game/project.godot"))
 for f in files:
     h.update(str(f).encode())

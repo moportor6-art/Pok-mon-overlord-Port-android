@@ -10,7 +10,14 @@ Port offline para Android de **Pokémon Overlord** (fangame de jab_lao, Godot 4.
 
 ## Añadidos de Android
 
-- Controles táctiles (cruceta, A = Aceptar, B = Cancelar, i = Info). El botón `≡` los oculta o muestra.
+- Juego en **español** (diálogos, movimientos, objetos y menús). El diccionario está en `android/es.json`
+  y se aplica al compilar; el código original en inglés no se toca.
+- Toques directos en los menús: toca una opción para elegirla y otra vez para confirmar.
+- Botón **‹ Atrás** siempre visible (y el botón atrás de Android): nunca te quedas atrapado en un menú.
+- Volumen: toca la barra para ajustarlo.
+- Pistas cortas en pantalla la primera vez que entras a cada menú.
+- Botón **⟳ Actualizaciones** en el título: buscar actualización e historial de versiones.
+- Cruceta, A = Aceptar, B = Atrás, i = Info. El botón `≡` oculta o muestra la cruceta.
 - Pantalla completa en horizontal (gira con el sensor).
 - Firma de depuración fija (`android/debug.keystore`) para que cada versión se instale encima de la anterior sin perder la partida.
 
