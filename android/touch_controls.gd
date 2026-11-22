@@ -27,6 +27,7 @@ func _ready() -> void:
 
 	_btn(_holder, "Accept", Vector2(1470, 690), 72, Color(0.3, 0.85, 0.4, 0.45), "A")
 	_btn(_holder, "Cancel", Vector2(1310, 790), 60, Color(0.9, 0.3, 0.3, 0.45), "B")
+	_btn(_holder, "Info", Vector2(1490, 520), 48, Color(0.3, 0.5, 0.95, 0.45), "i")
 
 	var toggle := _btn(self, "", Vector2(48, 48), 34, Color(0, 0, 0, 0.35), "≡")
 	toggle.pressed.connect(_on_toggle)
