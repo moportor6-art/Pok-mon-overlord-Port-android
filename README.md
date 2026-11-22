@@ -31,7 +31,11 @@ Al abrir la app, a los 5 segundos busca la última versión y muestra las noveda
 
 - **Solo cambió el juego** (scripts, escenas, imágenes, sonidos): baja un parche pequeño `patch.pck`,
   se reinicia y lo carga `PatchLoader` al arrancar. No se reinstala nada.
-- **Cambió la parte nativa** (versión de Godot, `project.godot`, ajustes de exportación, Java, íconos):
-  baja la APK completa y Android la instala encima, sin desinstalar.
+- **Cambió la parte nativa** (versión de Godot, ajustes del proyecto, ajustes de exportación, Java, íconos):
+  baja la APK completa y Android la instala encima, sin desinstalar. Esto debería pasar muy rara vez:
+  `android/native_hash.py` solo cuenta lo que de verdad va dentro del APK. Los scripts de compilación,
+  la traducción, los `.gd`, escenas, imágenes y sonidos siempre viajan en el parche.
+- Para añadir funciones nuevas sin APK: ponerlas en los autoloads que ya existen (`port_ui.gd`,
+  `touch_controls.gd`, `touch_nav.gd`) o en los scripts del juego, no crear autoloads nuevos.
 - **Vuelta atrás**: si el juego no arranca con el parche (2 intentos), vuelve solo a lo que trae la APK.
 - Las partidas guardadas nunca se tocan.

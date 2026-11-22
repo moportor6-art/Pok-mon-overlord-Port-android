@@ -47,12 +47,15 @@ jobs:
           git commit -m "Proyecto recuperado desde index.pck (GDRE Tools)"
           git push
 
-      # 2) Huella nativa (antes de tocar project.godot) y ajustes de Android
-      - name: Huella nativa
-        run: echo "NATIVE=$(python3 android/native_hash.py "$GODOT_TAG")" >> "$GITHUB_ENV"
-
+      # 2) Ajustes de Android y huella nativa (solo lo que obliga a reinstalar el APK)
       - name: Aplicar ajustes de Android
         run: python3 android/apply_android.py game "$(cat VERSION)"
+
+      - name: Huella nativa
+        run: |
+          N=$(python3 android/native_hash.py "$GODOT_TAG" game)
+          echo "Huella nativa: $N"
+          echo "NATIVE=$N" >> "$GITHUB_ENV"
 
       - uses: actions/setup-java@v5
         with:
