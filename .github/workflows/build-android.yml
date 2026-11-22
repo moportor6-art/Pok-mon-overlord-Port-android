@@ -100,8 +100,11 @@ jobs:
       - name: Plantilla Android (gradle) + parche 120 Hz
         run: |
           rm -rf game/android/build
-          ~/godot/godot --headless --path game --install-android-build-template
-          test -d game/android/build
+          mkdir -p game/android/build
+          unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip -d game/android/build
+          echo "${GODOT_VERSION}.stable" > game/android/.build_version
+          touch game/android/build/.gdignore
+          ls game/android/build
           python3 android/patch_highrefresh.py game/android/build
 
       - name: Exportar APK
