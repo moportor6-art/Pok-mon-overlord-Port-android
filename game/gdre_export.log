@@ -1,0 +1,36 @@
+GDRE Tools v2.7.4
+Ubuntu 26.04.1 LTS 26.04, headless
+Opening file: ~/work/Pok-mon-overlord-Port-android/Pok-mon-overlord-Port-android/original/index.pck
+Loaded 354 imported files
+Detected Engine Version: 4.5.0
+Detected Bytecode Revision: 4.5.0-stable (ebc36a7)
+Successfully loaded PCK!
+Version: 4.5.0
+Verified 713 files, no errors detected!
+Extracted 713 files, no errors detected!
+Saved project config.
+
+
+********************************EXPORT REPORT********************************
+
+Totals:                                 
+Decompiled scripts:                     23
+Scripts not decompiled:                 0
+Imported resources for export session:  354
+Successfully converted:                 354
+Lossy:                                  11
+Rewrote metadata:                       295
+Non-importable conversions:             0
+Not converted:                          0
+Failed conversions:                     0
+-------------
+
+
+
+------------------------------------------------------------------------------------
+
+Use Godot editor version 4.5.0 to edit the project.
+
+*******************************************************************************
+
+Recovery finished in 00m02s

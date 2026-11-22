@@ -1,0 +1,458 @@
+[gd_scene load_steps=25 format=3 uid="uid://bct2bebui1cxw"]
+
+[ext_resource type="Script" uid="uid://djjbwgc05mhf6" path="res://Files/Title/title_scene.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://cuv5c0wi0lc5c" path="res://Files/Scenes/Menu/UI.tscn" id="2"]
+[ext_resource type="FontFile" uid="uid://bbcfrt4x2slms" path="res://Files/Fonts/pokemon-ds-font.ttf" id="3"]
+[ext_resource type="Texture2D" uid="uid://82o6ync8qmm2" path="res://Files/Title/Pokemon.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://d4a5ggt8mq4uv" path="res://Files/Title/Overlord.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://ryvdlh1ttoxy" path="res://Files/Title/Bg.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://brp4nk4nb704h" path="res://Files/Title/TitleBG.png" id="7"]
+[ext_resource type="AudioStream" uid="uid://d0fmrldfwa2q7" path="res://Files/BGMs/HGSS Menu Theme.mp3" id="8"]
+[ext_resource type="PackedScene" uid="uid://cyo2e6pjebvyn" path="res://Files/Scenes/Battle/BattleScene.tscn" id="9"]
+[ext_resource type="Script" uid="uid://tthb3swj4ht4" path="res://Files/Data/bf_encounters.gd" id="10"]
+[ext_resource type="Texture2D" uid="uid://b0j26ltmj22dw" path="res://Files/Sprites/UI/UIBox.png" id="11"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_6j2oy"]
+font = ExtResource("3")
+font_size = 112
+outline_size = 24
+outline_color = Color(0.12549, 0.12549, 0.12549, 1)
+
+[sub_resource type="Animation" id="Animation_ybet1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-196, -138)]
+}
+
+[sub_resource type="Animation" id="Animation_bej5i"]
+resource_name = "loop"
+length = 6.0
+loop_mode = 1
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.39, 1.19),
+"transitions": PackedFloat32Array(1, 0),
+"update": 0,
+"values": [Vector2(-196, -138), Vector2(244, -138)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_km55m"]
+_data = {
+&"RESET": SubResource("Animation_ybet1"),
+&"loop": SubResource("Animation_bej5i")
+}
+
+[sub_resource type="Animation" id="Animation_e4bha"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1600, 450)]
+}
+
+[sub_resource type="Animation" id="Animation_km55m"]
+resource_name = "loop"
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1600, 450), Vector2(0, 450)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ekcmu"]
+_data = {
+&"RESET": SubResource("Animation_e4bha"),
+&"loop": SubResource("Animation_km55m")
+}
+
+[sub_resource type="Gradient" id="Gradient_40bea"]
+offsets = PackedFloat32Array(0, 0.23163842, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.1254902, 0.1254902, 0.1254902, 1, 0.13, 0.13, 0.13, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_bej5i"]
+gradient = SubResource("Gradient_40bea")
+
+[sub_resource type="Animation" id="Animation_dfdik"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.215686, 0.615686, 0.670588, 0.509804)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(60, 29)]
+}
+
+[sub_resource type="Animation" id="Animation_kmpwa"]
+resource_name = "loop"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0.215686, 0.615686, 0.670588, 0.509804), Color(0.215686, 0.615686, 0.670588, 0.823529)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(60, 29), Vector2(60, 21)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_vl6bb"]
+_data = {
+&"RESET": SubResource("Animation_dfdik"),
+&"loop": SubResource("Animation_kmpwa")
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_gopad"]
+font = ExtResource("3")
+font_size = 64
+font_color = Color(1, 0.980392, 0.964706, 1)
+shadow_size = 4
+shadow_color = Color(0.1254902, 0.1254902, 0.1254902, 1)
+
+[node name="TitleScene" type="Node2D"]
+script = ExtResource("1")
+
+[node name="CanvasLayer" parent="." instance=ExtResource("2")]
+
+[node name="Title" type="Node2D" parent="."]
+
+[node name="Label" type="Label" parent="Title"]
+visible = false
+offset_left = 62.0
+offset_top = 148.0
+offset_right = 660.0
+offset_bottom = 239.0
+text = "Pokémon Overlord"
+label_settings = SubResource("LabelSettings_6j2oy")
+
+[node name="Pokemon" type="Sprite2D" parent="Title"]
+position = Vector2(370, 348)
+texture = ExtResource("4")
+
+[node name="Overlord" type="Sprite2D" parent="Title"]
+clip_children = 2
+position = Vector2(370, 360)
+texture = ExtResource("5")
+
+[node name="ColorRect" type="ColorRect" parent="Title/Overlord"]
+offset_left = -196.0
+offset_top = -138.0
+offset_right = -174.1304
+offset_bottom = -5.0
+rotation = 0.2268928
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Title/Overlord"]
+libraries = {
+&"": SubResource("AnimationLibrary_km55m")
+}
+autoplay = "loop"
+
+[node name="Sprite2D" type="Sprite2D" parent="Title"]
+z_index = -100
+position = Vector2(1600, 450)
+texture = ExtResource("6")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Title/Sprite2D"]
+libraries = {
+&"": SubResource("AnimationLibrary_ekcmu")
+}
+autoplay = "loop"
+speed_scale = 0.2
+
+[node name="Sprite2D2" type="Sprite2D" parent="Title"]
+z_index = -99
+position = Vector2(777.99994, 452)
+scale = Vector2(24.437498, 10.5)
+texture = SubResource("GradientTexture2D_bej5i")
+
+[node name="Menu" type="Node2D" parent="."]
+position = Vector2(-92, 0)
+
+[node name="BG" type="ColorRect" parent="Menu"]
+offset_left = 854.0
+offset_top = 200.0
+offset_right = 1257.0
+offset_bottom = 780.0
+color = Color(0.035, 0.0425833, 0.1, 1)
+
+[node name="TitleBG" type="Sprite2D" parent="Menu"]
+position = Vector2(1264, 494)
+texture = ExtResource("7")
+
+[node name="Selector" type="ColorRect" parent="Menu"]
+modulate = Color(1, 1, 1, 0.509804)
+offset_left = 862.0
+offset_top = 208.0
+offset_right = 1249.0
+offset_bottom = 258.0
+color = Color(0.215686, 0.615686, 0.670588, 0.509804)
+metadata/_edit_use_anchors_ = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Menu/Selector"]
+libraries = {
+&"": SubResource("AnimationLibrary_vl6bb")
+}
+autoplay = "loop"
+
+[node name="MenuList" type="VBoxContainer" parent="Menu"]
+offset_left = 878.0
+offset_top = 202.0
+offset_right = 1238.0
+offset_bottom = 618.0
+
+[node name="Play" type="Label" parent="Menu/MenuList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Play"
+label_settings = SubResource("LabelSettings_gopad")
+horizontal_alignment = 1
+
+[node name="Play2" type="Label" parent="Menu/MenuList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "????"
+label_settings = SubResource("LabelSettings_gopad")
+horizontal_alignment = 1
+
+[node name="League Challenge" type="Label" parent="Menu/MenuList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "League Challenge"
+label_settings = SubResource("LabelSettings_gopad")
+horizontal_alignment = 1
+
+[node name="Battle Frontier" type="Label" parent="Menu/MenuList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Battle Frontier"
+label_settings = SubResource("LabelSettings_gopad")
+horizontal_alignment = 1
+
+[node name="Versus Mode" type="Label" parent="Menu/MenuList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Versus Mode"
+label_settings = SubResource("LabelSettings_gopad")
+horizontal_alignment = 1
+
+[node name="Mewtwo Mode" type="Label" parent="Menu/MenuList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "????"
+label_settings = SubResource("LabelSettings_gopad")
+horizontal_alignment = 1
+
+[node name="Collection" type="Label" parent="Menu/MenuList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Collection"
+label_settings = SubResource("LabelSettings_gopad")
+horizontal_alignment = 1
+
+[node name="Options" type="Label" parent="Menu/MenuList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Options"
+label_settings = SubResource("LabelSettings_gopad")
+horizontal_alignment = 1
+
+[node name="Quit" type="Label" parent="Menu/MenuList"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Quit"
+label_settings = SubResource("LabelSettings_gopad")
+horizontal_alignment = 1
+
+[node name="InfoBox" type="Node2D" parent="."]
+
+[node name="BG" type="ColorRect" parent="InfoBox"]
+visible = false
+offset_left = 1181.0
+offset_top = 200.0
+offset_right = 1584.0
+offset_bottom = 425.0
+color = Color(0.035, 0.0425833, 0.1, 1)
+
+[node name="BG2" type="ColorRect" parent="InfoBox"]
+visible = false
+offset_left = 1189.0
+offset_top = 208.0
+offset_right = 1576.0
+offset_bottom = 417.0
+color = Color(0.156863, 0.172549, 0.290196, 1)
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InfoBox"]
+offset_left = 1205.0
+offset_top = 208.0
+offset_right = 1560.0
+offset_bottom = 417.0
+theme_override_colors/font_shadow_color = Color(0.1254902, 0.1254902, 0.1254902, 1)
+theme_override_constants/shadow_outline_size = 4
+theme_override_fonts/normal_font = ExtResource("3")
+theme_override_font_sizes/normal_font_size = 32
+bbcode_enabled = true
+text = "[center][color=bdbdbd]-Play-[center][color=fffaf6][center]Start a normal run."
+
+[node name="Continue" type="Node2D" parent="."]
+
+[node name="ColorRect2" type="ColorRect" parent="Continue"]
+offset_left = 767.0
+offset_top = 119.0
+offset_right = 1157.0
+offset_bottom = 180.0
+
+[node name="ColorRect" type="ColorRect" parent="Continue/ColorRect2"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 386.0
+offset_bottom = 57.0
+color = Color(0.07058824, 0.07058824, 0.08627451, 1)
+
+[node name="Selector" type="ColorRect" parent="Continue"]
+visible = false
+offset_left = 771.0
+offset_top = 123.0
+offset_right = 1153.0
+offset_bottom = 176.0
+color = Color(0.21568628, 0.6156863, 0.67058825, 0.50980395)
+
+[node name="Play" type="Label" parent="Continue"]
+custom_minimum_size = Vector2(0, 60)
+offset_left = 770.0
+offset_top = 118.0
+offset_right = 1163.0
+offset_bottom = 178.0
+text = "Continue"
+label_settings = SubResource("LabelSettings_gopad")
+horizontal_alignment = 1
+
+[node name="ScreenTint" type="ColorRect" parent="."]
+z_index = 30
+offset_right = 1600.0
+offset_bottom = 900.0
+color = Color(0, 0, 0, 0)
+metadata/_edit_lock_ = true
+
+[node name="BGMPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8")
+volume_db = -15.0
+autoplay = true
+parameters/looping = true
+
+[node name="GUIPlayer" type="AudioStreamPlayer" parent="."]
+volume_db = -15.0
+
+[node name="BattleScene" parent="." instance=ExtResource("9")]
+z_index = -1
+position = Vector2(3, 260)
+scale = Vector2(0.5, 0.5)
+display_mode = true
+
+[node name="BG" parent="BattleScene" index="0"]
+visible = false
+
+[node name="Selector" parent="BattleScene/UnitField" index="0"]
+visible = false
+
+[node name="Encounters" type="Node" parent="."]
+script = ExtResource("10")
+
+[node name="InputHint" type="Node2D" parent="."]
+position = Vector2(61, 837)
+
+[node name="BG2" type="ColorRect" parent="InputHint"]
+visible = false
+offset_left = -45.0
+offset_top = -13.0
+offset_right = 478.0
+offset_bottom = 47.0
+color = Color(0.0352941, 0.0431373, 0.101961, 1)
+
+[node name="BG" type="ColorRect" parent="InputHint"]
+visible = false
+offset_left = -39.0
+offset_top = -7.0
+offset_right = 472.0
+offset_bottom = 41.0
+color = Color(0.156863, 0.172549, 0.290196, 1)
+
+[node name="Sprite2D" type="Sprite2D" parent="InputHint"]
+position = Vector2(230.49997, 17)
+texture = ExtResource("11")
+hframes = 2
+
+[node name="Label" type="RichTextLabel" parent="InputHint"]
+offset_left = -31.0
+offset_top = -7.0
+offset_right = 882.0
+offset_bottom = 49.0
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 1)
+theme_override_constants/shadow_outline_size = 4
+theme_override_fonts/normal_font = ExtResource("3")
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[color=202020]Interact:[color=000000] Z  [color=202020]Cancel:[/color] X  [color=202020]Info:[/color] C "
+
+[editable path="BattleScene"]
