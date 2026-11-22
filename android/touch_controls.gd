@@ -44,11 +44,54 @@ func _ready() -> void:
 	toggle.pressed.connect(_on_toggle)
 
 	_build_hint()
+	_apply_settings()
+
+
+var _orig_timer := 0.0
+
+
+func _process(d: float) -> void:
+	# Ocultar los controles y la barra de teclas originales del juego (los de este port los reemplazan)
+	_orig_timer += d
+	if _orig_timer < 0.5:
+		return
+	_orig_timer = 0.0
+	var g = get_node_or_null("/root/globals")
+	var core = g.get("core") if g else null
+	if core and is_instance_valid(core):
+		var cl = core.get_node_or_null("TouchControls/CanvasLayer")
+		if cl and cl.visible:
+			cl.hide()
+		var hint = core.get_node_or_null("Scenes/TitleScene/InputHint")
+		if hint and hint.visible:
+			hint.hide()
+
+
+func _apply_settings() -> void:
+	var pu = get_node_or_null("/root/PortUI")
+	if pu and pu.has_method("get_setting"):
+		_shown = bool(pu.get_setting("cruceta", true))
+		_holder.visible = _shown
+
+
+func set_dpad_visible(v: bool) -> void:
+	_shown = v
+	if _holder:
+		_holder.visible = v
+
+
+func buzz() -> void:
+	var pu = get_node_or_null("/root/PortUI")
+	if pu and pu.has_method("get_setting") and bool(pu.get_setting("vibracion", true)):
+		Input.vibrate_handheld(12)
 
 
 func _on_toggle() -> void:
 	_shown = not _shown
 	_holder.visible = _shown
+	var pu = get_node_or_null("/root/PortUI")
+	if pu and pu.has_method("set_setting"):
+		pu.set_setting("cruceta", _shown)
 	show_hint("Controles ocultos: toca directamente el juego · ≡ para volver a verlos" if not _shown else "Controles visibles", 2.5)
 
 
@@ -120,6 +163,7 @@ func show_hint(text: String, secs := 3.5) -> void:
 
 
 func ripple(p: Vector2) -> void:
+	buzz()
 	var r := Ripple.new()
 	r.position = p
 	add_child(r)
@@ -157,6 +201,7 @@ func _round_btn(parent: Node, action: String, center: Vector2, radius: int, col:
 		var cl := _label(caption, Vector2(radius * 2 + 40, 26), 20)
 		cl.position = Vector2(-20, radius * 2 + 2)
 		b.add_child(cl)
+	b.pressed.connect(buzz)
 	parent.add_child(b)
 	_hit.append([Rect2(center - Vector2(radius, radius), Vector2(radius * 2, radius * 2)), parent != self])
 	return b
@@ -174,6 +219,7 @@ func _pill_btn(parent: Node, action: String, r: Rect2, text: String) -> TouchScr
 		b.action = action
 	b.position = r.position
 	b.add_child(_label(text, r.size, 28))
+	b.pressed.connect(buzz)
 	parent.add_child(b)
 	_hit.append([r, parent != self])
 	return b

@@ -30,6 +30,9 @@ with open(os.path.join(proj, "export_presets.cfg"), "w", encoding="utf-8") as f:
 import subprocess
 subprocess.check_call([sys.executable, os.path.join(here, "translate_es.py"), proj])
 
+with open(os.path.join(port, "version.gd"), "w") as f:
+    f.write(f'extends RefCounted\nconst NAME := "{version}"\n')
+
 pg = os.path.join(proj, "project.godot")
 with open(pg, encoding="utf-8") as f:
     lines = f.read().split("\n")
