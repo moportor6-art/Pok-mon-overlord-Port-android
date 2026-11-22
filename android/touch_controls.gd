@@ -7,6 +7,7 @@ const BASE := Vector2(1600, 900)
 
 var _holder: Node2D
 var _shown := true
+var _hit := []  # [centro, radio, en_holder]
 
 
 func _ready() -> void:
@@ -31,6 +32,29 @@ func _ready() -> void:
 
 	var toggle := _btn(self, "", Vector2(48, 48), 34, Color(0, 0, 0, 0.35), "≡")
 	toggle.pressed.connect(_on_toggle)
+
+
+func is_over_controls(p: Vector2) -> bool:
+	for h in _hit:
+		if h[2] and not _shown:
+			continue
+		if p.distance_to(h[0]) <= h[1] + 10:
+			return true
+	return false
+
+
+func _notification(what: int) -> void:
+	# Botón "atrás" de Android = Cancelar
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		_tap_action("Cancel")
+
+
+func _tap_action(a: String) -> void:
+	Input.action_press(a)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	await get_tree().process_frame
+	Input.action_release(a)
 
 
 func _on_toggle() -> void:
@@ -60,6 +84,7 @@ func _btn(parent: Node, action: String, center: Vector2, radius: int, col: Color
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(l)
 	parent.add_child(b)
+	_hit.append([center, float(radius), parent != self])
 	return b
 
 

@@ -51,7 +51,7 @@ jobs:
       - name: Aplicar ajustes de Android
         run: python3 android/apply_android.py game "$(cat VERSION)"
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -96,6 +96,13 @@ jobs:
       # 4) Importar y exportar
       - name: Importar recursos
         run: ~/godot/godot --headless --path game --import || true
+
+      - name: Plantilla Android (gradle) + parche 120 Hz
+        run: |
+          rm -rf game/android/build
+          ~/godot/godot --headless --path game --install-android-build-template
+          test -d game/android/build
+          python3 android/patch_highrefresh.py game/android/build
 
       - name: Exportar APK
         env:

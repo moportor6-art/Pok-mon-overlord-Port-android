@@ -13,8 +13,11 @@ version = sys.argv[2] if len(sys.argv) > 2 else "0.1"
 run = os.environ.get("GITHUB_RUN_NUMBER", "1")
 here = os.path.dirname(os.path.abspath(__file__))
 
-os.makedirs(os.path.join(proj, "android"), exist_ok=True)
-shutil.copy(os.path.join(here, "touch_controls.gd"), os.path.join(proj, "android", "touch_controls.gd"))
+port = os.path.join(proj, "port")
+os.makedirs(port, exist_ok=True)
+for fn in ["touch_controls.gd", "touch_nav.gd", "splash.png", "icon_192.png", "icon_512.png",
+           "icon_fg_432.png", "icon_bg_432.png"]:
+    shutil.copy(os.path.join(here, fn), os.path.join(port, fn))
 
 with open(os.path.join(here, "export_presets.cfg"), encoding="utf-8") as f:
     presets = f.read()
@@ -43,7 +46,22 @@ def set_key(section, key, value):
     lines.insert(start, f"{key}={value}")
 
 
-set_key("autoload", "TouchControls", '"*res://android/touch_controls.gd"')
+set_key("autoload", "TouchControls", '"*res://port/touch_controls.gd"')
+set_key("autoload", "TouchNav", '"*res://port/touch_nav.gd"')
+# Logo del juego en vez de Godot
+set_key("application", "config/icon", '"res://port/icon_512.png"')
+set_key("application", "boot_splash/show_image", "true")
+set_key("application", "boot_splash/image", '"res://port/splash.png"')
+set_key("application", "boot_splash/bg_color", "Color(0.055, 0.07, 0.157, 1)")
+set_key("application", "boot_splash/fullsize", "true")
+set_key("application", "boot_splash/stretch_mode", "1")
+set_key("application", "boot_splash/use_filter", "true")
+# Botón atrás = Cancelar (no cerrar el juego)
+set_key("application", "config/quit_on_go_back", "false")
+# Pantalla completa y 120 Hz
+set_key("display", "window/size/mode", "3")
+set_key("display", "window/vsync/vsync_mode", "1")
+set_key("application", "run/max_fps", "0")
 set_key("display", "window/handheld/orientation", "4")
 set_key("input_devices", "pointing/emulate_mouse_from_touch", "true")
 set_key("rendering", "textures/vram_compression/import_etc2_astc", "true")
