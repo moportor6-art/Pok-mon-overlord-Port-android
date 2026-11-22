@@ -15,7 +15,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 port = os.path.join(proj, "port")
 os.makedirs(port, exist_ok=True)
-for fn in ["touch_controls.gd", "touch_nav.gd", "splash.png", "icon_192.png", "icon_512.png",
+for fn in ["patch_loader.gd", "touch_controls.gd", "touch_nav.gd", "splash.png", "icon_192.png", "icon_512.png",
            "icon_fg_432.png", "icon_bg_432.png"]:
     shutil.copy(os.path.join(here, fn), os.path.join(port, fn))
 
@@ -62,6 +62,10 @@ set_key("application", "config/quit_on_go_back", "false")
 set_key("display", "window/size/mode", "3")
 set_key("display", "window/vsync/vsync_mode", "1")
 set_key("application", "run/max_fps", "0")
+# Build de esta APK (lo usa PatchLoader para saber si un parche sobra)
+set_key("application", "config/version", f'"{run}"')
+# El cargador de parches tiene que ser el PRIMER autoload (set_key inserta al principio)
+set_key("autoload", "PatchLoader", '"*res://port/patch_loader.gd"')
 set_key("display", "window/handheld/orientation", "4")
 set_key("input_devices", "pointing/emulate_mouse_from_touch", "true")
 set_key("rendering", "textures/vram_compression/import_etc2_astc", "true")

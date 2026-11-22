@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: write   # para publicar cada versión (la busca el actualizador de la app)
 
 env:
   GODOT_VERSION: "4.5"
@@ -47,7 +47,10 @@ jobs:
           git commit -m "Proyecto recuperado desde index.pck (GDRE Tools)"
           git push
 
-      # 2) Ajustes de Android
+      # 2) Huella nativa (antes de tocar project.godot) y ajustes de Android
+      - name: Huella nativa
+        run: echo "NATIVE=$(python3 android/native_hash.py "$GODOT_TAG")" >> "$GITHUB_ENV"
+
       - name: Aplicar ajustes de Android
         run: python3 android/apply_android.py game "$(cat VERSION)"
 
@@ -93,27 +96,26 @@ jobs:
           export/android/debug_keystore_pass = "android"
           EOF
 
-      # 4) Importar y exportar
+      # 4) Importar, validar y exportar
       - name: Importar recursos
         run: ~/godot/godot --headless --path game --import || true
 
       - name: Validar scripts del port
         run: |
-          for f in touch_nav touch_controls; do
+          for f in patch_loader touch_nav touch_controls; do
             out=$(~/godot/godot --headless --path game --check-only --script res://port/$f.gd 2>&1 || true)
             echo "$out"
             if echo "$out" | grep -qiE "parse error|script error"; then exit 1; fi
           done
 
-      - name: Plantilla Android (gradle) + parche 120 Hz
+      - name: Plantilla Android (gradle) + 120 Hz + actualizador
         run: |
           rm -rf game/android/build
           mkdir -p game/android/build
           unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip -d game/android/build
           echo "${GODOT_VERSION}.stable" > game/android/.build_version
           touch game/android/build/.gdignore
-          ls game/android/build
-          python3 android/patch_highrefresh.py game/android/build
+          python3 android/patch_android_build.py game/android/build ${{ github.run_number }} "$NATIVE"
 
       - name: Exportar APK
         env:
@@ -125,22 +127,49 @@ jobs:
           GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: android
         run: |
           mkdir -p build
-          V=$(cat VERSION)
-          ~/godot/godot --headless --path game --export-release "Android" "$GITHUB_WORKSPACE/build/PokemonOverlord-v$V.apk"
+          APK="PokemonOverlord-v$(cat VERSION)-build-${{ github.run_number }}.apk"
+          ~/godot/godot --headless --path game --export-release "Android" "$GITHUB_WORKSPACE/build/$APK"
+          test -f "build/$APK"
           ls -la build
-          unzip -lv build/*.apk | sort -k1 -n -r | head -12
-          test -f "build/PokemonOverlord-v$V.apk"
+          echo "APK=$APK" >> "$GITHUB_ENV"
+
+      # 5) Parche del juego para el actualizador
+      - name: Parche del juego (.pck)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BASE=$(python3 android/find_base.py "$NATIVE" /tmp/base)
+          echo "Build base con la misma parte nativa: $BASE"
+          EXTRA=""
+          if [ "$BASE" != "0" ] && [ -f /tmp/base/base.pck ]; then
+            if ~/godot/godot --headless --path game --export-patch "Android" "$GITHUB_WORKSPACE/build/patch.pck" --patches /tmp/base/base.pck \
+               && [ -f build/patch.pck ]; then
+              EXTRA="--patch build/patch.pck $BASE"
+            else
+              echo "No se pudo crear el parche: esta versión se ofrecerá como APK completa"
+            fi
+          else
+            ~/godot/godot --headless --path game --export-pack "Android" "$GITHUB_WORKSPACE/build/base.pck"
+            test -f build/base.pck
+            EXTRA="--base build/base.pck"
+          fi
+          python3 android/manifest.py ${{ github.run_number }} "$NATIVE" "build/$APK" build/contenido.json $EXTRA
+          git log -1 --pretty=%B | grep -vE '^(Co-Authored-By|Claude-Session):' > build/notas.md
+          ls -la build
 
       - uses: actions/upload-artifact@v4
         with:
           name: PokemonOverlord-apk
           path: build/*.apk
 
-      # 5) Publicar en Releases
-      - name: Publicar release
+      # 6) Cada compilación se publica como versión: la app la encuentra y se actualiza sola
+      - name: Publicar versión
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          V=$(cat VERSION)
-          gh release view "v$V" >/dev/null 2>&1 || gh release create "v$V" --title "Pokémon Overlord Android v$V" --notes "APK compilado automáticamente."
-          gh release upload "v$V" build/*.apk --clobber
+          TAG="build-${{ github.run_number }}"
+          FILES="build/$APK build/contenido.json"
+          [ -f build/patch.pck ] && FILES="$FILES build/patch.pck"
+          [ -f build/base.pck ] && FILES="$FILES build/base.pck"
+          gh release create "$TAG" $FILES --title "Pokémon Overlord v$(cat VERSION) · build ${{ github.run_number }}" \
+            --notes-file build/notas.md --target "${{ github.sha }}" --latest
