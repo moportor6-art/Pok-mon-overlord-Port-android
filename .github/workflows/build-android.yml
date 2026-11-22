@@ -128,6 +128,7 @@ jobs:
           V=$(cat VERSION)
           ~/godot/godot --headless --path game --export-release "Android" "$GITHUB_WORKSPACE/build/PokemonOverlord-v$V.apk"
           ls -la build
+          unzip -lv build/*.apk | sort -k1 -n -r | head -12
           test -f "build/PokemonOverlord-v$V.apk"
 
       - uses: actions/upload-artifact@v4
