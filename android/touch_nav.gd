@@ -353,10 +353,20 @@ func _find_named(nm: String) -> Array:
 
 
 func _find_script(path: String):
+	# Solo se busca dentro de la escena del título (ahí viven el título y el menú de la Liga)
 	var c = _cache.get(path)
 	if c and is_instance_valid(c) and c.is_inside_tree():
 		return c
-	var found = _search(get_tree().root, path)
+	var g = get_node_or_null("/root/globals")
+	var core = g.get("core") if g else null
+	var t = null
+	var sc = core.get_node_or_null("Scenes") if core and is_instance_valid(core) else null
+	if sc:
+		for ch in sc.get_children():
+			var scr = ch.get_script()
+			if scr and scr.resource_path == TITLE_SCRIPT and not ch.is_queued_for_deletion():
+				t = ch
+	var found = _search(t, path) if t else null
 	_cache[path] = found
 	return found
 
