@@ -110,7 +110,7 @@ func _process(_d: float) -> void:
 	var t = _find_title()
 	var vis: bool = t != null and not _any_open() and int(t.get("state")) == 1
 	_btn_set.visible = vis
-	_btn_upd.visible = vis
+	_btn_upd.visible = vis and _bridge != null   # en PC (Port Launcher) no hay actualizador propio
 
 
 # ---------------------------------------------------------------- paneles y botones
@@ -231,17 +231,13 @@ func _buzz() -> void:
 
 func _check() -> void:
 	if _bridge:
-		_bridge.check()
-	else:
-		OS.shell_open(RELEASES_URL)
+		_bridge.check()   # en PC no hay nada que abrir: lo actualiza el Port Launcher
 	_close()
 
 
 func _history() -> void:
 	if _bridge:
 		_bridge.history()
-	else:
-		OS.shell_open(RELEASES_URL)
 	_close()
 
 
