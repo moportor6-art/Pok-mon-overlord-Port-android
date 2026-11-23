@@ -176,3 +176,62 @@ jobs:
           [ -f build/base.pck ] && FILES="$FILES build/base.pck"
           gh release create "$TAG" $FILES --title "Pokémon Overlord v$(cat VERSION) · build ${{ github.run_number }}" \
             --notes-file build/notas.md --target "${{ github.sha }}" --latest
+
+  # Versión de Windows para el Port Launcher: el mismo proyecto exportado a .exe y subido a la misma versión.
+  # Va aparte para no tocar la huella nativa de Android (su preset y los ajustes de texturas solo viven aquí).
+  windows:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ajustes del port y preset de Windows
+        run: |
+          python3 android/apply_android.py game "$(cat VERSION)"
+          cat windows/preset.cfg >> game/export_presets.cfg
+          # Texturas para PC (además de las de móvil)
+          if grep -q '^textures/vram_compression/import_s3tc_bptc' game/project.godot; then
+            sed -i 's|^textures/vram_compression/import_s3tc_bptc=.*|textures/vram_compression/import_s3tc_bptc=true|' game/project.godot
+          else
+            sed -i 's|^textures/vram_compression/import_etc2_astc=true|textures/vram_compression/import_etc2_astc=true\ntextures/vram_compression/import_s3tc_bptc=true|' game/project.godot
+          fi
+          grep -n vram_compression game/project.godot
+
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/godot
+            ~/.local/share/godot/export_templates
+          key: godot-${{ env.GODOT_TAG }}
+
+      - name: Descargar Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot && cd ~/godot
+          wget -q https://github.com/godotengine/godot/releases/download/${GODOT_TAG}/Godot_v${GODOT_TAG}_linux.x86_64.zip
+          wget -q https://github.com/godotengine/godot/releases/download/${GODOT_TAG}/Godot_v${GODOT_TAG}_export_templates.tpz
+          unzip -q Godot_v${GODOT_TAG}_linux.x86_64.zip
+          mv Godot_v${GODOT_TAG}_linux.x86_64 godot && chmod +x godot
+          mkdir -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          unzip -q Godot_v${GODOT_TAG}_export_templates.tpz
+          mv templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+          rm -f *.zip *.tpz
+
+      - name: Importar recursos
+        run: ~/godot/godot --headless --path game --import || true
+
+      - name: Exportar para Windows
+        run: |
+          mkdir -p build/windows
+          ~/godot/godot --headless --path game --export-release "Windows Desktop" "$GITHUB_WORKSPACE/build/windows/PokemonOverlord.exe"
+          test -f build/windows/PokemonOverlord.exe
+          test -f build/windows/PokemonOverlord.pck
+          cd build/windows && zip -q -r "../PokemonOverlord-Windows.zip" . && cd ../..
+          ls -la build build/windows
+
+      - name: Subir a la versión
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "build-${{ github.run_number }}" build/PokemonOverlord-Windows.zip --clobber
