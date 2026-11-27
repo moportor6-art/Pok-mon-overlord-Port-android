@@ -15,7 +15,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 port = os.path.join(proj, "port")
 os.makedirs(port, exist_ok=True)
-for fn in ["patch_loader.gd", "port_ui.gd", "touch_controls.gd", "touch_nav.gd", "splash.png", "icon_192.png", "icon_512.png",
+for fn in ["patch_loader.gd", "port_ui.gd", "touch_controls.gd", "touch_nav.gd", "expedicion.gd", "expediciones.json", "splash.png", "icon_192.png", "icon_512.png",
            "icon_fg_432.png", "icon_bg_432.png"]:
     shutil.copy(os.path.join(here, fn), os.path.join(port, fn))
 

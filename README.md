@@ -19,6 +19,9 @@ Port offline para Android de **Pokémon Overlord** (fangame de jab_lao, Godot 4.
 - Botón **⟳ Actualizaciones** en el título: buscar actualización e historial de versiones.
 - Cruceta, A = Aceptar, B = Atrás, i = Info. El botón `≡` oculta o muestra la cruceta.
 - Pantalla completa en horizontal (gira con el sensor).
+- **🌱 Expedición** (0.8, mundo de prueba de [worldgen](https://github.com/moportor6-art/worldgen)): botón arriba a la
+  derecha cuando caminas libre. Te lleva a una cueva generada (6 mapas de `android/expediciones.json`, pintados con las
+  casillas de cueva del juego, con rocas y hoyos que bloquean); «↩ Volver» te deja donde estabas (`android/expedicion.gd`).
 - Firma de depuración fija (`android/debug.keystore`) para que cada versión se instale encima de la anterior sin perder la partida.
 
 La versión del APK está en `VERSION`.

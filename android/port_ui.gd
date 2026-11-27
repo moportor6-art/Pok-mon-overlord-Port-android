@@ -20,6 +20,10 @@ var _fps_label: Label
 var _opt_btns := []  # [boton, clave, valor]
 var _toggles := {}
 var _title: Node
+# Expedición (mundo de prueba de worldgen): botón en partida que lleva a una cueva generada y de vuelta
+const Expedicion = preload("res://port/expedicion.gd")
+var _btn_exp: Button
+var _exp_vuelta = null
 var _title_prev_state := 1
 var _bridge = null
 var _font: Font
@@ -111,6 +115,39 @@ func _process(_d: float) -> void:
 	var vis: bool = t != null and not _any_open() and int(t.get("state")) == 1
 	_btn_set.visible = vis
 	_btn_upd.visible = vis and _bridge != null   # en PC (Port Launcher) no hay actualizador propio
+	var lv := _nivel()
+	var pl = lv.get_node_or_null("Actors/Player") if lv else null
+	var gl = get_node_or_null("/root/globals")
+	_btn_exp.visible = pl != null and not _any_open() and not (gl != null and bool(gl.get("in_cutscene"))) and int(pl.get("state")) == 0
+	_btn_exp.text = "↩ Volver" if _exp_vuelta != null else "🌱 Expedición"
+
+
+func _nivel() -> Node:
+	var cs := get_tree().current_scene
+	return cs if cs and cs.get_node_or_null("Tiles/Floor") else null
+
+
+# Expedición: la primera vez guarda dónde estabas y te lleva a una cueva generada; la segunda te devuelve
+func _expedicion() -> void:
+	var lv := _nivel()
+	if lv == null:
+		return
+	var pl = lv.get_node_or_null("Actors/Player")
+	var cam = pl.get_node_or_null("Camera") if pl else null
+	if pl == null or bool(pl.get("moving")):
+		return
+	_buzz()
+	if _exp_vuelta == null:
+		_exp_vuelta = {"pos": pl.global_position, "l": cam.limit_left, "t": cam.limit_top, "r": cam.limit_right, "b": cam.limit_bottom} if cam else {"pos": pl.global_position}
+		if Expedicion.entrar(lv) == null:
+			_exp_vuelta = null
+	else:
+		pl.global_position = _exp_vuelta["pos"]
+		if cam and _exp_vuelta.has("l"):
+			cam.limit_left = _exp_vuelta["l"]; cam.limit_top = _exp_vuelta["t"]
+			cam.limit_right = _exp_vuelta["r"]; cam.limit_bottom = _exp_vuelta["b"]
+			cam.reset_smoothing()
+		_exp_vuelta = null
 
 
 # ---------------------------------------------------------------- paneles y botones
@@ -131,6 +168,10 @@ func _build_ui() -> void:
 	add_child(_btn_upd)
 	_btn_set.visible = false
 	_btn_upd.visible = false
+	_btn_exp = _game_box_button("🌱 Expedición", Vector2(1330, 90), Vector2(250, 64))
+	_btn_exp.pressed.connect(_expedicion)
+	_btn_exp.visible = false
+	add_child(_btn_exp)
 
 	_fps_label = Label.new()
 	_fps_label.position = Vector2(1480, 8)
